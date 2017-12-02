@@ -37,21 +37,22 @@ app.get("/", function(req, res) {
   console.log(query);
 });
 
-app.post("/post_data", bp.json(), function(req, res) {
+app.post("/post_data", function(req, res) {
   var request_url = url.parse(req.url, true);
   console.log("Incoming POST request to " + request_url.pathname + " from " + req.connection.remoteAddress);
+  
+  var data = req.body;
+  console.log(data);
 
   res.writeHead(200, {"Content-Type": "application/json"});
-
-  queries.new_post(db, req.body, function(dberr, dbres) {
+  
+  queries.new_post(db, data, function(dberr, dbres) {
     var json = {
       "status": (dberr) ? "fail" : "success",
       "result": dbres
     };
     res.end(JSON.stringify(json));
   });
-
-  console.log(req.body);
 });
 
 var dbport = 27017;
