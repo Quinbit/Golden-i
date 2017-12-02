@@ -37,21 +37,25 @@ app.get("/", function(req, res) {
   console.log(query);
 });
 
-app.post("/post_data", bp.json(), function(req, res) {
+app.post("/post_data", function(req, res) {
   var request_url = url.parse(req.url, true);
   console.log("Incoming POST request to " + request_url.pathname + " from " + req.connection.remoteAddress);
 
+  var data = [];
+  var keywords = req.body.keywords;
+  var message = req.body.message_id;
+
+  for(var i = 0; i < keywords.length; i++) data.push({"keywords":keywords[i], "message_id":message[i]});
+
   res.writeHead(200, {"Content-Type": "application/json"});
 
-  queries.new_post(db, req.body, function(dberr, dbres) {
+  queries.post_data(db, data, function(dberr, dbres) {
     var json = {
       "status": (dberr) ? "fail" : "success",
       "result": dbres
     };
     res.end(JSON.stringify(json));
   });
-
-  console.log(req.body);
 });
 
 var dbport = 27017;
@@ -67,6 +71,4 @@ MongoClient.connect(dburl, function(err, database) {
 
   app.listen(port);
   console.log("Server listening on port " + port);
-
-  queries.new_post(db, {"name":"Corbin"});
 });
