@@ -2,12 +2,15 @@ var http = require("http");
 var fs = require("fs");
 var url = require('url');
 var express = require("express");
-var myParser = require("body-parser");
+var bp = require("body-parser");
+var MongoClient = require("mongodb").MongoClient;
+
+var queries = require("./mongo_queries").mongo_queries;
 
 var port = 4242;
 
 var app = express();
-app.use(myParser.urlencoded({extended : true}));
+app.use(bp.urlencoded({extended : true}));
 
 app.post("/", function(req, res) {
   var request_url = url.parse(req.url, true);
@@ -33,5 +36,19 @@ app.get("/", function(req, res) {
   console.log(query);
 });
 
-app.listen(port);
-console.log("Server listening on port " + port);
+var dbport = 27017;
+var dburl = "mongodb://localhost:" + dbport + "/golden-i";
+
+var db;
+
+MongoClient.connect(dburl, function(err, database) {
+  if(err) throw err;
+
+  console.log("Connected to MongoClient on port " + dbport);
+  db = database;
+
+  app.listen(port);
+  console.log("Server listening on port " + port);
+
+  queries.new_post(db, {"name":"Corbin"});
+});
