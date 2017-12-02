@@ -42,10 +42,10 @@ app.post("/post_data", function(req, res) {
   console.log("Incoming POST request to " + request_url.pathname + " from " + req.connection.remoteAddress);
 
   var data = [];
-  var keywords = req.body.data[0];
-  var ids = req.body.data[1];
+  var keywords = req.body.keywords;
+  var message = req.body.message;
 
-  for(var i = 0; i < keywords.length; i++) data.push({"keywords":keywords[i], "id":ids[i]});
+  for(var i = 0; i < keywords.length; i++) data.push({"keywords":keywords[i], "message_id":message[i]});
 
   res.writeHead(200, {"Content-Type": "application/json"});
 
