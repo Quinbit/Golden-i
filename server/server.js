@@ -2,7 +2,6 @@ var http = require("http");
 var fs = require("fs");
 
 var port = 4242;
-var host = "127.0.0.1";
 
 var server = http.createServer(function(req, res) {
   if(req.url === "/") {
@@ -34,5 +33,5 @@ var server = http.createServer(function(req, res) {
   }
 });
 
-server.listen(port, host);
-console.log("Server listening at http://" + host + ":" + port);
+server.listen(port);
+console.log("Server listening on port " + port);
