@@ -4,17 +4,18 @@ from google.cloud import language
 from google.oauth2 import service_account
 
 
-access_token = "EAACEdEose0cBAESUjAgTdM6WC0ntJuGNZAXJdqcgH1ieCmZBq9Nlw6lyshv0XcjTi8oz9eKStioIKAEBkTPMXpr8ZAMcgAy4161utpl7gAIKxPOYaGRNaliY2cfmIvJ5HmrjSzfSgWzSJKBfMvGtqpPFQD7yZBUpHMqZAmdynvZBHzGeEcLnboUbHNJABlRh0ZD"
+access_token = "EAACEdEose0cBAIZBci7JVpgF3RjDRnIIaT0KzHdbZArPZAonbPasQQd6jHepaUPRWFb64NumlUX1sOsGUmZCYsBvX0iDoaaLstThV3ZA4ZAxhgzIjZCWUMyVglr83IJ2e7u3qSMuH1X6MoFLocZCWBZBQOiZBACZA5SctZCZBVU5SmCkpI6Bbl6D7VDr7yyLun5YlOD4ZD"
 graph = facebook.GraphAPI(access_token=access_token, version="2.11")
 
 base_url = "https://graph.facebook.com/v2.7/"
-max_page =1
-max_comments = 1
+num_page = 1
+max_page =3
+max_comments = 3
 
 client = language.LanguageServiceClient()
 #f = open("messages.txt", "a")
 
-#g = open("complaints.txt", "a")
+g = open("complaints.txt", "w")
 
 needs = ['want', 'wish', 'problem', 'issue', 'dislike', 'annoying', 'annoyance']
 
@@ -66,7 +67,7 @@ if __name__=="__main__":
     pages = graph.search(type='page',q='news')
     pages = pages['data']
 
-    for i in range(1):
+    for i in range(num_page):
         messages_and_ids = []
         id = pages[i]['id']
         print("Processing " + pages[i]["name"])
@@ -77,7 +78,8 @@ if __name__=="__main__":
 
 
 
-        wants = {"keywords":[], "sentence":[], "message_id":[]}
+        wants = {"data":[]}
+        data = []
         for n in range(len(messages_and_ids)):
             print("Analyzing content of message " + str(n+1))
             try:
@@ -95,6 +97,8 @@ if __name__=="__main__":
 
             entities = response.entities
             #print("Analyzing sentiment " + str(n))
+            words = []
+            ids = messages_and_ids[n][1]
             for x in entities:
                 #print(x.sentiment.score)
                 #print(messages_and_ids[1][n][i])
@@ -103,17 +107,19 @@ if __name__=="__main__":
                 except:
                     val = 1.0
                 if val < 0.0:
-                    #g.write(messages_and_ids[n][0] + "\n")
-                    wants["keywords"].append(x.name)
-                    wants["sentence"].append(messages_and_ids[n][0])
-                    wants["message_id"].append(messages_and_ids[n][1])
+                    g.write(messages_and_ids[n][0])
+                    words.append(x.name)
 
-        print(wants)
-        r = requests.post("http://morrisjchen.com:4242/post_data", data=wants)
+            data.append({"keywords":words, "id": ids})
+
+        #print(wants)
+        wants["data"] = data
+        string = str(wants)
+        r = requests.post("http://morrisjchen.com:4242/post_data", data=string)
         print(r.status_code, r.reason)
 
         if (int(r.status_code) != 200):
             break;
     #f.close()
 
-    #g.close()
+    g.close()
