@@ -9,6 +9,7 @@ import string
 import wikipedia
 from lxml import etree
 import requests
+import time
 
 
 my_api_key = "AIzaSyBItnuy5o16BtfVEfCbkm6PHlq_JnlU_mY"
@@ -69,45 +70,63 @@ with open("english_words.txt") as word_file:
 def is_english_word(word):
     return word.lower() in english_words
 
-html = urlopen('https://www.cbinsights.com/research/wealth-tech-fin-tech-market-map/').read()
-text = text_from_html(html)
-props = get_proper_nouns(text)
-alpha = keep_alpha(props)
-names = [s for s in alpha if not is_english_word(s)]
+def get_sites(link):
+    print('Opening html...')
+    html = urlopen(link).read()
+    print('Extracting text...')
+    text = text_from_html(html)
+    print('Filtering nouns...')
+    props = get_proper_nouns(text)
+    print('Trimming tokens...')
+    alpha = keep_alpha(props)
+    print('Filtering proper nouns...')
+    names = [s for s in alpha if not is_english_word(s)]
+
+    res_links = []
+    for string in names:
+        print('Checking noun ' + string + '...')
+        try:
+            # Throw exception if no wikipedia page found
+            page = wikipedia.page(string, auto_suggest=False)
+
+            r = requests.get(page.url).text
+            doc = etree.fromstring(r)
+            num_of_employees = doc.xpath('//table[@class="infobox vcard"]/tr[th/div/text()="Number of employees"]/td')
+            website = doc.xpath('//table[@class="infobox vcard"]/tr[th/text()="Website"]/td/span/a')
+
+            found_num_of_employees = len(num_of_employees) > 0
+            if found_num_of_employees:
+                num_of_employees = int(keep_nums(num_of_employees[0].text))
+
+            found_website = len(website) > 0
+            if found_website:
+                website = website[0].attrib['href']
+
+            if not found_num_of_employees:
+                print('No employee count found')
+            elif not found_website:
+                print('No website found')
+
+            if found_num_of_employees and num_of_employees < 1000 and found_website:
+                print(string)
+                print(str(num_of_employees) + ' employees')
+                print(website)
+                print()
+                res_links.append(website)
+
+        except Exception as e:
+            print('No Wikipedia page found')
+            pass
+    return res_links
 
 
-for string in names:
-    try:
-        # Throw exception if no wikipedia page found
-        page = wikipedia.page(string, auto_suggest=False)
-
-        r = requests.get('https://en.wikipedia.org/wiki/' + page.title).text
-        doc = etree.fromstring(r)
-        num_of_employees = doc.xpath('//table[@class="infobox vcard"]/tr[th/div/text()="Number of employees"]/td')
-        website = doc.xpath('//table[@class="infobox vcard"]/tr[th/text()="Website"]/td/span/a')
-
-        found_num_of_employees = len(num_of_employees) > 0
-        if found_num_of_employees:
-            num_of_employees = int(keep_nums(num_of_employees[0].text))
-        else:
-            num_of_employees = -1
-
-        found_website = len(website) > 0
-        if found_website:
-            website = website[0].attrib['href']
-        else:
-            website = 'N/A'
-
-        if found_num_of_employees and num_of_employees < 1000:
-            print(string)
-            print(str(num_of_employees) + ' employees')
-            print(website)
-            print()
-        elif not found_num_of_employees and found_website:
-            print(string + '(?)')
-            print(website)
-            print()
-
-
-    except Exception as e:
-        pass
+results = google_search('cheap wealth management tech startup', my_api_key, my_cse_id, num=5)
+sites = []
+for result in results:
+    print('Crawling ' + result['link'])
+    if result['link'] == get_domain(result['link']):
+        print('*** Direct link, adding to sites')
+        sites.append(result['link'])
+    else:
+        print('*** Article link, crawling for sites...')
+        sites.append(get_sites(result['link']))
