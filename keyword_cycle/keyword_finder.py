@@ -1,5 +1,4 @@
-import sys
-import json
+import pymongo
 
 def filter_none(some_array):
 	for i in range(len(some_array)):
@@ -153,8 +152,17 @@ def parse_for_website(positives, ids):
 			relevant_comments.append(ids[i])
 	return top_five, relevant_comments
 
-input_json = json.loads(sys.argv[1])['data']
-print input_json
-print parse_for_website(input_json['Keywords'], input_json['id'])
+connection = pymongo.MongoClient('localhost', 27017)
+db = connection.golden-i
+post_data = db.post_data
+items = post_data.find().sort({"message_id":1})
+keywords = []
+ids = []
+for each in items:
+	keywords.append(each['keywords'])
+	ids.append(each['message_id'])
+
+print parse_for_website(keywords, ids)
+
 
 #{'data': [{'id':'1', 'keywords':'hello 1 2 3'}, {'id':2', 'keywords':'hello 2 3 4'}]}
