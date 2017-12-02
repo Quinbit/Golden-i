@@ -11,7 +11,7 @@ var port = 4242;
 
 var app = express();
 app.use(bp.urlencoded({extended : true}));
-app.use(express.json({limit: "50mb"}));
+app.use(bp.json({limit: "50mb"}));
 
 app.post("/", function(req, res) {
   var request_url = url.parse(req.url, true);
