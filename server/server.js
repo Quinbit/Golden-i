@@ -42,6 +42,10 @@ app.post("/post_data", function(req, res) {
   console.log("Incoming POST request to " + request_url.pathname + " from " + req.connection.remoteAddress);
 
   var data = req.body;
+  if(typeof data === "string") {
+    console.log("Received JSON string, parsing...");
+    data = JSON.parse(data);
+  }
   console.log(data);
 
   res.writeHead(200, {"Content-Type": "application/json"});
