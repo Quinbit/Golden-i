@@ -2,15 +2,16 @@ import facebook
 import requests
 from google.cloud import language
 from google.oauth2 import service_account
+import json
 
 
-access_token = "EAACEdEose0cBAIZBci7JVpgF3RjDRnIIaT0KzHdbZArPZAonbPasQQd6jHepaUPRWFb64NumlUX1sOsGUmZCYsBvX0iDoaaLstThV3ZA4ZAxhgzIjZCWUMyVglr83IJ2e7u3qSMuH1X6MoFLocZCWBZBQOiZBACZA5SctZCZBVU5SmCkpI6Bbl6D7VDr7yyLun5YlOD4ZD"
+access_token = "EAACEdEose0cBAEfNZBZCPA0yaXZBOmZBVSIhptkbuKUccwaTFPhlAvKaK8AtHOnY5AnWeHV6klgIgC5TAJ2WgSo5HfGmnbdmoaba8x8hlyY46IMSx8ZCV5nZCZCZCc7fjLose0PSCYbwO2SnzFtOgGDvhCyXc3KEoY1saZC0SKsaKd9v4mUvESTZA4rgSZAda3pv7cZD"
 graph = facebook.GraphAPI(access_token=access_token, version="2.11")
 
 base_url = "https://graph.facebook.com/v2.7/"
 num_page = 1
-max_page =3
-max_comments = 3
+max_page = 1
+max_comments = 1
 
 client = language.LanguageServiceClient()
 #f = open("messages.txt", "a")
@@ -45,7 +46,11 @@ def parse_data(data):
 
 def get_comments(iden):
     mes = graph.get_object(id=iden,fields="comments")
-    mes = mes["comments"]["data"]
+    try:
+        mes = mes["comments"]["data"]
+    except:
+        print(mes)
+        return []
 
     res = []
 
@@ -64,13 +69,14 @@ def test_for_want(message):
     return False
 
 if __name__=="__main__":
-    pages = graph.search(type='page',q='news')
+    pages = graph.search(type='page',q='techcrunch')
     pages = pages['data']
 
     for i in range(num_page):
         messages_and_ids = []
         id = pages[i]['id']
         print("Processing " + pages[i]["name"])
+
         url = base_url + id + "/posts?access_token=" + access_token
         messages =  get_facebook_data(max_page, url)
         print("Finished page with " + str(len(messages)) + " valid messages")
@@ -78,7 +84,7 @@ if __name__=="__main__":
 
 
 
-        wants = {"data":[]}
+        wants = {"keywords":[], "message_id":[]}
         data = []
         for n in range(len(messages_and_ids)):
             print("Analyzing content of message " + str(n+1))
@@ -110,12 +116,14 @@ if __name__=="__main__":
                     g.write(messages_and_ids[n][0])
                     words.append(x.name)
 
-            data.append({"keywords":words, "id": ids})
-
+            #data.append({"keywords":words, "id": ids})
+            wants["keywords"].append(words)
+            wants["message_id"].append(ids)
         #print(wants)
-        wants["data"] = data
-        string = str(wants)
-        r = requests.post("http://morrisjchen.com:4242/post_data", data=string)
+        #g.write(str(data))
+        headers = {'content-type': 'application/json'}
+        print(json.dumps(wants))
+        r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
         print(r.status_code, r.reason)
 
         if (int(r.status_code) != 200):
