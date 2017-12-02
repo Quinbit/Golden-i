@@ -41,16 +41,15 @@ app.post("/post_data", function(req, res) {
   var request_url = url.parse(req.url, true);
   console.log("Incoming POST request to " + request_url.pathname + " from " + req.connection.remoteAddress);
 
-  var data = req.body;
-  if(typeof data === "string") {
-    console.log("Received JSON string, parsing...");
-    data = JSON.parse(data);
-  }
-  console.log(data);
+  var data = [];
+  var keywords = req.body.data[0];
+  var ids = req.body.data[1];
+
+  for(var i = 0; i < keywords.length; i++) data.push({"keywords":keywords[i], "id":ids[i]});
 
   res.writeHead(200, {"Content-Type": "application/json"});
 
-  queries.post_data(db, data.data, function(dberr, dbres) {
+  queries.post_data(db, data, function(dberr, dbres) {
     var json = {
       "status": (dberr) ? "fail" : "success",
       "result": dbres
