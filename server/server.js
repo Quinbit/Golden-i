@@ -43,7 +43,7 @@ app.post("/post_data", function(req, res) {
 
   var data = [];
   var keywords = req.body.keywords;
-  var message = req.body.message;
+  var message = req.body.message_id;
 
   for(var i = 0; i < keywords.length; i++) data.push({"keywords":keywords[i], "message_id":message[i]});
 
