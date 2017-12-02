@@ -153,15 +153,16 @@ def parse_for_website(positives, ids):
 	return top_five, relevant_comments
 
 connection = pymongo.MongoClient('localhost', 27017)
-db = connection.golden-i
+db = connection.goldeni
 post_data = db.post_data
-items = post_data.find().sort({"message_id":1})
+items = post_data.find()
 keywords = []
 ids = []
 for each in items:
 	keywords.append(each['keywords'])
 	ids.append(each['message_id'])
-
+print keywords
+print ids
 print parse_for_website(keywords, ids)
 
 

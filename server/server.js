@@ -59,7 +59,7 @@ app.post("/post_data", function(req, res) {
 });
 
 var dbport = 27017;
-var dburl = "mongodb://localhost:" + dbport + "/golden-i";
+var dburl = "mongodb://localhost:" + dbport + "/goldeni";
 
 var db;
 
