@@ -37,7 +37,7 @@ app.get("/", function(req, res) {
   console.log(query);
 });
 
-app.post("/post_data", bp.json, function(req, res) {
+app.post("/post_data", bp.json(), function(req, res) {
   var request_url = url.parse(req.url, true);
   console.log("Incoming POST request to " + request_url.pathname + " from " + req.connection.remoteAddress);
 
