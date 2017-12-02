@@ -1,7 +1,7 @@
 var http = require("http");
 var fs = require("fs");
 
-var port = 8080;
+var port = 4242;
 var host = "127.0.0.1";
 
 var server = http.createServer(function(req, res) {
