@@ -68,6 +68,4 @@ MongoClient.connect(dburl, function(err, database) {
 
   app.listen(port);
   console.log("Server listening on port " + port);
-
-  queries.new_post(db, {"name":"Corbin"});
 });
