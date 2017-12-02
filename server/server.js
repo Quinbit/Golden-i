@@ -11,6 +11,7 @@ var port = 4242;
 
 var app = express();
 app.use(bp.urlencoded({extended : true}));
+app.use(express.json({limit: "50mb"}));
 
 app.post("/", function(req, res) {
   var request_url = url.parse(req.url, true);
@@ -34,6 +35,23 @@ app.get("/", function(req, res) {
   res.end("GET received with data: " + JSON.stringify(query));
 
   console.log(query);
+});
+
+app.post("/post_data", function(req, res) {
+  var request_url = url.parse(req.url, true);
+  console.log("Incoming POST request to " + request_url.pathname + " from " + req.connection.remoteAddress);
+
+  res.writeHead(200, {"Content-Type": "application/json"});
+
+  queries.new_post(db, req.body, function(dberr, dbres) {
+    var json = {
+      "status": (dberr) ? "fail" : "success",
+      "result": dbres
+    };
+    res.end(JSON.stringify(json));
+  });
+
+  console.log(req.body);
 });
 
 var dbport = 27017;
