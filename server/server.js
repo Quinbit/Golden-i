@@ -80,7 +80,7 @@ app.get("/crawl_status", function(req, res) {
   var query = request_url.query;
   var status = busy ? "busy" : "idle";
   res.writeHead(200, {'Content-Type': 'application/json'});
-  res.end({"status":status});
+  res.end(JSON.stringify({"status":status}));
 });
 
 var dbport = 27017;
