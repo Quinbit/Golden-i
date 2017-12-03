@@ -44,8 +44,10 @@ app.post("/post_data", function(req, res) {
   var data = [];
   var keywords = req.body.keywords;
   var message = req.body.message_id;
+  var name = req.body.name;
+  var dataurl = req.body.url;
 
-  for(var i = 0; i < keywords.length; i++) data.push({"keywords":keywords[i], "message_id":message[i]});
+  for(var i = 0; i < keywords.length; i++) data.push({"keywords":keywords[i], "message_id":message[i], "name":name, "url":dataurl});
 
   res.writeHead(200, {"Content-Type": "application/json"});
 
