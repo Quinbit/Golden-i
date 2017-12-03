@@ -18,6 +18,7 @@ max_comments = 10
 client = language.LanguageServiceClient()
 
 needs = ['want', 'wish', 'problem', 'issue', 'dislike', 'annoying', 'annoyance']
+headers = {'content-type': 'application/json'}
 
 app = Flask(__name__)
 CORS(app)
@@ -120,7 +121,8 @@ def crawl_page(url):
     wants["name"] = page["name"]
     wants["url"] = base_url + id + "?access_token=" + access_token
     wants["tag"] = page["name"]
-    wants["ends"] = True
+    wants["busy"] = False
+    wants["starts"] = False
     #print(wants)
     #g.write(str(data))
     headers = {'content-type': 'application/json'}
@@ -185,10 +187,10 @@ def begin_crawl(search_term, num_pages):
         wants["name"] = pages[i]["name"]
         wants["url"] = base_url + id + "?access_token=" + access_token
         wants["tag"] = search_term
-        wants["ends"] = (i == (int(num_pages) - 1))
+        wants["busy"] = not (i == (int(num_pages) - 1))
+        wants["starts"] = False
         #print(wants)
         #g.write(str(data))
-        headers = {'content-type': 'application/json'}
         #print(json.dumps(wants))
         r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
         print(r.status_code, r.reason)
@@ -201,10 +203,14 @@ def begin_crawl(search_term, num_pages):
 
 @app.route('/crawl/<term>/<num_pages>')
 def start_general_crawl(term, num_pages):
+    wants = {"busy" : True, "starts": True}
+    r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
     begin_crawl(term, num_pages)
 
 @app.route('/analyze/<url>')
 def start_specific_crawl(url):
+    wants = {"busy" : True, "starts": True}
+    r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
     crawl_page(url)
 
 if __name__=="__main__":
