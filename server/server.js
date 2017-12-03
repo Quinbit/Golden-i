@@ -106,14 +106,26 @@ app.get("/get_gui", function(req, res) {
   res.writeHead(200, {'Content-Type': 'application/json'});
 
   queries.get_gui(db, function(dberr, dbres) {
-/*
-    var json = {
-      "data": dbres;
-    }
-*/
     console.log(dbres);
     res.end(JSON.stringify(dbres));
   });
+});
+
+app.post("/request_analysis", function(req, res){
+  var request_url = url.parse(req.url, true);
+  console.log("Incoming POST request to " + request_url.pathname + " from " + req.connection.remoteAddress);
+
+  res.writeHead(200, {"Content-Type": "application/json"});
+
+  var id = req.body.id;
+  PythonShell.run("../find_companies/find_companies.py", {args:[id]}, function(pyerr, pyres) {
+    res.end(JSON.stringify({"status":pyerr ? "fail" : "success"}));
+
+    if(pyerr) throw pyerr;
+    console.log(pyres);
+  });
+
+
 });
 
 var dbport = 27017;
