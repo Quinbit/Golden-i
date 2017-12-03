@@ -11,5 +11,5 @@ function get_gui(db, callback) {
 }
 
 module.exports.mongo_queries = {
-  new_post, post_data
+  new_post, post_data, get_gui
 }

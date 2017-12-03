@@ -106,11 +106,13 @@ app.get("/get_gui", function(req, res) {
   res.writeHead(200, {'Content-Type': 'application/json'});
 
   queries.get_gui(db, function(dberr, dbres) {
+/*
     var json = {
       "data": dbres;
     }
-    console.log(json);
-    res.end(JSON.stringify(json));
+*/
+    console.log(dbres);
+    res.end(JSON.stringify(dbres));
   });
 });
 
