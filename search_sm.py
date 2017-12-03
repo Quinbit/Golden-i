@@ -4,6 +4,7 @@ from google.cloud import language
 from google.oauth2 import service_account
 import json
 from flask import Flask, jsonify
+from flask_cors import CORS
 
 
 access_token = "EAACEdEose0cBAHZCMJJk6Hq8F3zmImxIlxQFtS8I6k2xmOo5LVlBuBAjVFOYfmqFFbQq6etYdoG20S3uoGaQHGI4Pw7urOZBAxVQwoDoZCQVVp261AlOhMzE4EHZAcF5yBYmNQNZBadkgnfQYZCbNLPAOvF4Wx8T8nsGoKZCRu5ctr2w0u38ZAwjZAs5ha3s9cYAZD"
@@ -19,6 +20,7 @@ client = language.LanguageServiceClient()
 needs = ['want', 'wish', 'problem', 'issue', 'dislike', 'annoying', 'annoyance']
 
 app = Flask(__name__)
+CORS(app)
 
 def get_facebook_data(index, url):
     r = requests.get(url)
