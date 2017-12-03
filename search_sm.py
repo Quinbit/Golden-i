@@ -3,9 +3,10 @@ import requests
 from google.cloud import language
 from google.oauth2 import service_account
 import json
+from flask import Flask, jsonify
 
 
-access_token = "EAACEdEose0cBAM6DeELkJz7PfdV4XMz2ZAsUpD1fcmSq07ohI7iunkcl0BR3h1HAdTWWgXwFLX0j2FqLu1IuPrAcRWM7BP7DLXM3A6LzCr43eNLjpBz11z8bQjrpykOhv508ptICIAIaqRZAC0yF9eW3WwYXhEMPUcrpPnVaPUtKnxbgrZACZA6bfZAKrLI0ZD"
+access_token = "EAACEdEose0cBACFtRKe53Gchz2AXAcCATDwTnZCYDODwZCgsPZAANColNlp6YIPIHBvSAzJd5g3mvP6N79XYPxIt2779YOAticzGegKEZBngYZCPEJmnoSVaK7Yq4a4Yv0AZCBuVL6OUDKSC23qXA6ZAQX3ANlldAwgJZCZB5P0Tyeq1audH3LhrkhuEFZBc7AvncZD"
 graph = facebook.GraphAPI(access_token=access_token, version="2.11")
 
 base_url = "https://graph.facebook.com/v2.7/"
@@ -16,6 +17,13 @@ max_comments = 10
 client = language.LanguageServiceClient()
 
 needs = ['want', 'wish', 'problem', 'issue', 'dislike', 'annoying', 'annoyance']
+
+app = Flask(__name__)
+
+results = [
+    {"state":"idle"},
+    {"state":"working"}
+]
 
 def get_facebook_data(index, url):
     r = requests.get(url)
@@ -114,6 +122,7 @@ def crawl_page(url):
         wants["message_id"].append(ids)
     wants["name"] = page["name"]
     wants["url"] = base_url + id + "?access_token=" + access_token
+    wants["tag"] = page["name"]
     #print(wants)
     #g.write(str(data))
     headers = {'content-type': 'application/json'}
@@ -177,6 +186,7 @@ def begin_crawl(search_term):
             wants["message_id"].append(ids)
         wants["name"] = pages[i]["name"]
         wants["url"] = base_url + id + "?access_token=" + access_token
+        wants["tag"] = search_term
         #print(wants)
         #g.write(str(data))
         headers = {'content-type': 'application/json'}
@@ -189,3 +199,14 @@ def begin_crawl(search_term):
     #f.close()
 
     g.close()
+
+@app.route('/crawl/<term>')
+def start_general_crawl(term):
+    begin_crawl(term)
+
+@app.route('/analyze/<url>')
+def start_specific_crawl(url):
+    crawl_page(url)
+
+if __name__=="__main__":
+    app.run(host='0.0.0.0', debug=True, port=3134)
