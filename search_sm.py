@@ -201,13 +201,13 @@ def begin_crawl(search_term, num_pages):
 
     g.close()
 
-@app.route('/crawl/<term>/<num_pages>')
+@app.route('/crawl/<term>/<num_pages>', methods = ['POST'])
 def start_general_crawl(term, num_pages):
     wants = {"busy" : True, "starts": True}
     r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
     begin_crawl(term, num_pages)
 
-@app.route('/analyze/<url>')
+@app.route('/analyze/<url>', methods = ['POST'])
 def start_specific_crawl(url):
     wants = {"busy" : True, "starts": True}
     r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
