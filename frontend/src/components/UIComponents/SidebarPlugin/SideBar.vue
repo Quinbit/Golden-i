@@ -1,7 +1,7 @@
 <template>
   <div :class="sidebarClasses"
        :data-background-color="backgroundColor"
-       :data-active-color="activeColor">
+       :data-active-color="'warning'">
     <!--
             Tip 1: you can change the color of the sidebar's background using: data-background-color="white | black | darkblue"
             Tip 2: you can change the color of the active button using the data-active-color="primary | info | success | warning | danger"
@@ -11,9 +11,9 @@
       <div class="logo">
         <a href="#" class="simple-text">
             <div class="logo-img">
-                <img src="static/img/vue-logo.png" alt="">
+                <img src="static/img/logo-new.jpg" alt="">
             </div>
-          Paper Dashboard
+          Golden i
         </a>
       </div>
       <slot>
@@ -99,7 +99,6 @@
       return {
         linkHeight: 60,
         activeLinkIndex: 0,
-
         windowWidth: 0,
         isWindows: false,
         hasAutoHeight: false
@@ -125,8 +124,6 @@
       }
     }
   }
-
 </script>
 <style>
-
 </style>
