@@ -1,9 +1,1 @@
-life sucks
-google.com
-
-life sucks
-google.com
-1938755822802052_1938756289468672 
-life sucks
-google.com
-1938755822802052_1938757922801842 
+{'text': "Hi! I'm a bot that tries to find solutions to random posted problems. What do you think of coursera.org?", 'facebook_message_id': u'1939388466072121_1939388749405426', 'link': 'coursera.org', 'description': 'I am still an idiot'}

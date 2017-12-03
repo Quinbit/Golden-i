@@ -1,30 +1,44 @@
 import requests
 import json
+import ast
 
 solution_posts_file = open("solution_posts.txt").read().rstrip().split("\n")
-
-token = "EAACEdEose0cBAISF4d6XbAAZBQ9Q3JLpieO9FWPsqNTTvYAd2vy7UeYvY3xfbNfZBdYnhK3LpUoeV6OMK1wD1IRjMz70w5seuZBULxpvFRkZCqfcXZAwDfZCX1hsc5BUMJOlgMXgbYjflAtin9njoudc8qpgmU4kGZB7UCHZAk6qgJHBnmj8zgpNtpnLqDtZAJRxPM8TAd8EMxQZDZD"
-
 solution_posts = []
-for i in range(len(solution_posts_file)/3):
-	solution_posts.append([solution_posts_file[i*3], solution_posts_file[i*3+1], solution_posts_file[i*3+2]])
+for each in solution_posts_file:
+	solution_posts.append(ast.literal_eval(each))
 
-print solution_posts
-for each in solution_posts:
-	print solution_posts
+token = "EAACEdEose0cBAFbZAIL2q59gqatTAGeYL3Sts8KPOUlPO0bL8rONKvI5cv4vyZCKtXy5ZCZB9iPXafFZAD2wLKERVZBL5ar6fSJWgQ1drkbbLEAbmU03NnakvHwmER0ZChgspgBkd1ii8dCd4iuhMpVZBr5wh7EJAbzjbTHuD48yozgbc2HKdBaZB7IIFf2nQM0bDUzunYoQZCrwZDZD"
 
 for each in solution_posts:
-	print each
 	base = 'https://graph.facebook.com/v2.11'
-	node = '/' + each[2] + '/insights/post_impressions'
+	node = '/' + each['facebook_post_id'] + '/insights/post_impressions'
 	url = base+node
 	parameters = {'period': 'week', 'access_token': token}
 	object = requests.get(url, params=parameters).text.encode('utf-8')
 	data = json.loads(object)
-	print data['data']['values']['value']
+	each['post_impressions'] = data['data'][0]['values'][0]['value']
 
-solution_messages_file = open("solution_messages.txt").read().rstrip().split("\n")
+	base = 'https://graph.facebook.com/v2.11'
+	node = '/' + each['facebook_post_id'] + '/insights/post_reactions_by_type_total'
+	url = base+node
+	parameters = {'period': 'week', 'access_token': token}
+	object = requests.get(url, params=parameters).text.encode('utf-8')
+	data = json.loads(object)
+	each['reactions'] = data['data'][0]['values'][0]['value']
 
-solution_messages = []
-for i in range(len(solution_messages_file)/3):
-	solution_messages.append([solution_messages_file[i*3], solution_messages_file[i*3+1], solution_messages_file[i*3+2].rstrip().split(' ')])
+responses = []
+for each in solution_posts:
+	responses.append({'impressions':each['post_impressions'], 'reactions':each['reactions'], 'link':each['link']})
+
+total_positive = 0
+for each in responses:
+	total_positive += each['reactions']['love'] + each['reactions']['like'] + each['reactions']['wow'] + each['reactions']['haha']
+	#total_positive += len(each['comments'])
+
+print total_positive
+
+for each in responses:
+	print each
+	pass
+
+#Posts analyzed, reacts, startups found, problems found
