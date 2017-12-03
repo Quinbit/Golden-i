@@ -3,6 +3,7 @@ var fs = require("fs");
 var url = require('url');
 var express = require("express");
 var bp = require("body-parser");
+var cors = require("cors");
 var MongoClient = require("mongodb").MongoClient;
 
 var queries = require("./mongo_queries").mongo_queries;
@@ -10,6 +11,7 @@ var queries = require("./mongo_queries").mongo_queries;
 var port = 4242;
 
 var app = express();
+app.use(cors());
 app.use(bp.urlencoded({extended : true}));
 app.use(bp.json({limit: "50mb"}));
 
@@ -66,6 +68,8 @@ app.post("/post_data", function(req, res) {
   for(var i = 0; i < keywords.length; i++)
     data.push({"keywords":keywords[i], "message_id":message[i], "name":name, "url":dataurl, "tag":tag});
 
+  console.log("Name: " + name + " Tag: " + tag);
+
   queries.post_data(db, data, function(dberr, dbres) {
     var json = {
       "status": (dberr) ? "fail" : "success",
@@ -92,6 +96,7 @@ app.get("/crawl_status", function(req, res) {
 
   var query = request_url.query;
   var status = busy ? "busy" : "idle";
+  console.log("Status: " + status);
   res.writeHead(200, {'Content-Type': 'application/json'});
   res.end(JSON.stringify({"status":status}));
 });
