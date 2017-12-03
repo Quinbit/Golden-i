@@ -139,7 +139,8 @@ app.post("/request_analysis", function(req, res) {
   PythonShell.run("../find_companies/find_companies.py", {pythonPath:"python3", args:[tag]}, function(pyerr, pyres) {
     res.end(JSON.stringify({"status":pyerr ? "fail" : "success"}));
 
-    if(pyerr) throw pyerr;
+    //if(pyerr) throw pyerr;
+    console.log(pyerr);
     console.log(pyres);
   });
 });
