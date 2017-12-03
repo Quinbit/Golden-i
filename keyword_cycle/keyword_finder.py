@@ -108,10 +108,12 @@ def get_cycles(input_pairs):
 def get_best(positives):
 	weight = 300
 	for try_num in range(30):
+		print "Try num " + str(try_num+1)
 		cycles = get_cycles(get_heavy(positives, -weight))
 		if 10 <= len(cycles) < 50:
 			break
 		elif len(cycles) < 10:
+			print "Too few"
 			weight = int(weight + 100)
 		else:
 			weight = int(weight - 70)
@@ -160,7 +162,17 @@ for each in items:
 	keywords.append(each['keywords'])
 	ids.append(each['message_id'])
 
-print str(json.dumps(parse_for_website(keywords, ids)))
+keywords, comments = parse_for_website(keywords, ids)
+print keywords
+print comments
 
+gui_data = db.gui_data
+names = post_data.find({"tag":sys.argv[1]}, {"_id":0, "name":1})
+
+
+names = list(set([x["name"] for x in names]))
+print names
+
+gui_data.insert({'tag':sys.argv[1], 'keywords':keywords, 'comments':comments, 'links_available':False, 'links':None, 'names':names})
 
 #{'data': [{'id':'1', 'keywords':'hello 1 2 3'}, {'id':2', 'keywords':'hello 2 3 4'}]}

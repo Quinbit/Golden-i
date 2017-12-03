@@ -2,13 +2,12 @@ import requests
 import json
 import ast
 
-solution_posts_file = open("solution_posts.txt").read().rstrip().split("\n")
+solution_posts_file = open("/home/morris/Github/Golden-i/social_media_front/solution_posts.txt").read().rstrip().split("\n")
 solution_posts = []
 for each in solution_posts_file:
 	solution_posts.append(ast.literal_eval(each))
 
-token = "EAACEdEose0cBAFbZAIL2q59gqatTAGeYL3Sts8KPOUlPO0bL8rONKvI5cv4vyZCKtXy5ZCZB9iPXafFZAD2wLKERVZBL5ar6fSJWgQ1drkbbLEAbmU03NnakvHwmER0ZChgspgBkd1ii8dCd4iuhMpVZBr5wh7EJAbzjbTHuD48yozgbc2HKdBaZB7IIFf2nQM0bDUzunYoQZCrwZDZD"
-
+token = "EAACEdEose0cBAKj0Al1AjLdwqhr6A2ky5PFnoHPRHccZC9yTesSLvrfJ3aDQ77xvNVGjhomuPNnIjw7VHp4GKm3AUkEwNwTEKS8IvMhh64eZCCCZCMB1N0Y8HVNBZCBT8jq7q6dl25EdBhE43TbfaUpyymHDYRrAafuZAsEDpUEUN0TAujBLxGBFEHM4TkGf5GUja0b1XAgZDZD"
 for each in solution_posts:
 	base = 'https://graph.facebook.com/v2.11'
 	node = '/' + each['facebook_post_id'] + '/insights/post_impressions'

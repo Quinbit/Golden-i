@@ -11,7 +11,7 @@ from lxml import etree
 import requests
 import time
 import sys
-
+import pymongo
 
 my_api_key = "AIzaSyBItnuy5o16BtfVEfCbkm6PHlq_JnlU_mY"
 my_cse_id = "005011606875748037020:u78tilaw9me"
@@ -61,7 +61,7 @@ def remove_non_numeric(string):
     return ''.join([c for c in string if c.isnumeric()])
 
 
-with open("english_words.txt") as word_file:
+with open("/home/morris/Github/Golden-i/find_companies/english_words.txt") as word_file:
     english_words = set(word.strip().lower() for word in word_file)
 
 
@@ -75,7 +75,7 @@ def get_sites(link):
     text = text.replace("Q", " Q").replace("R", " R").replace("S", " S").replace("T", " T").replace("U", " U").replace("V", " V")
     text = text.replace("W", " W").replace("X", " X").replace("Y", " Y").replace("Z", " Z")
     print('Filtering nouns...')
-    props = get_proper_nouns(text)
+    props = gdet_proper_nouns(text)
     print('Trimming tokens...')
     alpha = remove_non_alpha(props)
     print('Filtering proper nouns...')
@@ -113,7 +113,13 @@ def get_sites(link):
             pass
     return res_links
 
-search_phrase = sys.argv[1] + ' startup'
+connection = pymongo.MongoClient('localhost', 27017)
+db = connection.goldeni
+gui_data = db.gui_data
+object_tag = sys.argv[1]
+object_db = gui_data.find_one({"tag":object_tag})
+object_words = " ".join(object_db["keywords"])
+search_phrase = '"' + object_tag + '" ' + object_words + ' startup'
 print('Googling \'' + search_phrase + '\'')
 results = google_search(search_phrase, num=10)
 company_links = []
@@ -134,5 +140,7 @@ boring = ['https://www.facebook.com/', 'www.wiktionary.org', 'https://www.wikida
 for each in boring:
     while each in company_links:
         company_links.remove(each)
+
+gui_data.update({"tag":object_tag}, {"$set":{"links_available":True, "links":company_links}})
 
 print(company_links)
