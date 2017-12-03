@@ -97,6 +97,23 @@ app.get("/crawl_status", function(req, res) {
   res.end(JSON.stringify({"status":status}));
 });
 
+app.get("/get_gui", function(req, res) {
+  var request_url = url.parse(req.url, true);
+  console.log("Incoming GET request to " + request_url.pathname + " from " + req.connection.remoteAddress);
+
+  var query = request_url.query;
+
+  res.writeHead(200, {'Content-Type': 'application/json'});
+
+  queries.get_gui(db, function(dberr, dbres) {
+    var json = {
+      "data": dbres;
+    }
+    console.log(json);
+    res.end(JSON.stringify(json));
+  });
+});
+
 var dbport = 27017;
 var dburl = "mongodb://localhost:" + dbport + "/goldeni";
 
