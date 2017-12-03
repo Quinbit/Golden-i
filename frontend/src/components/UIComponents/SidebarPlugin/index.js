@@ -5,38 +5,18 @@ const SidebarStore = {
   sidebarLinks: [
     {
       name: 'Dashboard',
-      icon: 'ti-panel',
+      icon: 'ti-user',
       path: '/admin/overview'
     },
     {
-      name: 'User Profile',
-      icon: 'ti-user',
-      path: '/admin/stats'
+      name: 'Crawler Control',
+      icon: 'ti-panel',
+      path: '/admin/crawler'
     },
     {
-      name: 'Table List',
-      icon: 'ti-view-list-alt',
-      path: '/admin/table-list'
-    },
-    {
-      name: 'Typography',
-      icon: 'ti-text',
-      path: '/admin/typography'
-    },
-    {
-      name: 'Icons',
-      icon: 'ti-pencil-alt2',
-      path: '/admin/icons'
-    },
-    {
-      name: 'Maps',
-      icon: 'ti-map',
-      path: '/admin/maps'
-    },
-    {
-      name: 'Notifications',
+      name: 'Test Runner',
       icon: 'ti-bell',
-      path: '/admin/notifications'
+      path: '/admin/test'
     }
   ],
   displaySidebar (value) {

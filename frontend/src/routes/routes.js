@@ -10,6 +10,8 @@ import Icons from 'src/components/Dashboard/Views/Icons.vue'
 import Maps from 'src/components/Dashboard/Views/Maps.vue'
 import Typography from 'src/components/Dashboard/Views/Typography.vue'
 import TableList from 'src/components/Dashboard/Views/TableList.vue'
+import CrawlerView from 'src/components/Dashboard/Views/CrawlerView.vue'
+import TestRunner from 'src/components/Dashboard/Views/TestRunner.vue'
 
 const routes = [
   {
@@ -28,34 +30,14 @@ const routes = [
         component: Overview
       },
       {
-        path: 'stats',
-        name: 'stats',
-        component: UserProfile
+        path: 'crawler',
+        name: 'crawler',
+        component: CrawlerView
       },
       {
-        path: 'notifications',
-        name: 'notifications',
-        component: Notifications
-      },
-      {
-        path: 'icons',
-        name: 'icons',
-        component: Icons
-      },
-      {
-        path: 'maps',
-        name: 'maps',
-        component: Maps
-      },
-      {
-        path: 'typography',
-        name: 'typography',
-        component: Typography
-      },
-      {
-        path: 'table-list',
-        name: 'table-list',
-        component: TableList
+        path: 'test',
+        name: 'test',
+        component: TestRunner
       }
     ]
   },
