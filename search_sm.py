@@ -27,7 +27,11 @@ def get_facebook_data(index, url):
     r = requests.get(url)
     data = r.json()
     #print(data)
-    paging = data["paging"]
+    paging = data.get("paging", 0)
+
+    if paging == 0:
+        return []
+    
     data = data['data']
     n_page = paging.get("next", 0)
     print("Working on page " + str(max_page - index + 1))
