@@ -137,7 +137,7 @@ def begin_crawl(search_term, num_pages):
 
     g = open("complaints.txt", "w")
 
-    for i in range(int(num_pages)):
+    for i in range(min(int(num_pages), len(pages)):
         messages_and_ids = []
         id = pages[i]['id']
         print("Processing " + pages[i]["name"])
