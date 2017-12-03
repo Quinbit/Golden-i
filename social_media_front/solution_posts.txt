@@ -1,9 +1,2 @@
-life sucks
-google.com
-1937880972889537_1938755822802052
-life sucks
-google.com
-1937880972889537_1938756262802008
-life sucks
-google.com
-1937880972889537_1938757896135178
+{'text': 'As a solution to "I am still an idiot", we found coursera.org. What do you think?', 'facebook_post_id': u'1937880972889537_1939388466072121', 'link': 'coursera.org', 'description': 'I am still an idiot'}
+{'text': 'As a solution to "I am still an idiot", we found coursera.org. What do you think?', 'facebook_post_id': u'1937880972889537_1939388732738761', 'link': 'coursera.org', 'description': 'I am still an idiot'}

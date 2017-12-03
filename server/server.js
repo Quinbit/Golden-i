@@ -60,6 +60,16 @@ app.post("/post_data", function(req, res) {
   });
 });
 
+app.get("/crawl_status", function(req, res) {
+  var request_url = url.parse(req.url, true);
+  console.log("Incoming GET request to " + request_url.pathname + " from " + req.connection.remoteAddress);
+
+  var query = request_url.query;
+  var status = busy ? "busy" : "idle";
+  res.writeHead(200, {'Content-Type': 'application/json'});
+  res.end({"status":status});
+});
+
 var dbport = 27017;
 var dburl = "mongodb://localhost:" + dbport + "/goldeni";
 
