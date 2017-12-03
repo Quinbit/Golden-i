@@ -5,18 +5,15 @@ from google.oauth2 import service_account
 import json
 
 
-access_token = "EAACEdEose0cBAEfNZBZCPA0yaXZBOmZBVSIhptkbuKUccwaTFPhlAvKaK8AtHOnY5AnWeHV6klgIgC5TAJ2WgSo5HfGmnbdmoaba8x8hlyY46IMSx8ZCV5nZCZCZCc7fjLose0PSCYbwO2SnzFtOgGDvhCyXc3KEoY1saZC0SKsaKd9v4mUvESTZA4rgSZAda3pv7cZD"
+access_token = "EAACEdEose0cBAM6DeELkJz7PfdV4XMz2ZAsUpD1fcmSq07ohI7iunkcl0BR3h1HAdTWWgXwFLX0j2FqLu1IuPrAcRWM7BP7DLXM3A6LzCr43eNLjpBz11z8bQjrpykOhv508ptICIAIaqRZAC0yF9eW3WwYXhEMPUcrpPnVaPUtKnxbgrZACZA6bfZAKrLI0ZD"
 graph = facebook.GraphAPI(access_token=access_token, version="2.11")
 
 base_url = "https://graph.facebook.com/v2.7/"
-num_page = 1
-max_page = 1
-max_comments = 1
+num_page = 10
+max_page = 10
+max_comments = 10
 
 client = language.LanguageServiceClient()
-#f = open("messages.txt", "a")
-
-g = open("complaints.txt", "w")
 
 needs = ['want', 'wish', 'problem', 'issue', 'dislike', 'annoying', 'annoyance']
 
@@ -68,9 +65,68 @@ def test_for_want(message):
 
     return False
 
-if __name__=="__main__":
-    pages = graph.search(type='page',q='techcrunch')
+def crawl_page(url):
+    page = graph.search(id=url)
+
+    messages_and_ids = []
+    id = page['id']
+    print("Processing " + page["name"])
+
+    url = base_url + id + "/posts?access_token=" + access_token
+    messages =  get_facebook_data(max_page, url)
+    print("Finished page with " + str(len(messages)) + " valid messages")
+    messages_and_ids += messages
+
+    wants = {"keywords":[], "message_id":[]}
+    data = []
+    for n in range(len(messages_and_ids)):
+        print("Analyzing content of message " + str(n+1))
+        try:
+            document = language.types.Document(
+                content=messages_and_ids[n][0],
+                type='PLAIN_TEXT',
+            )
+
+            response = client.analyze_entity_sentiment(
+                document=document,
+                encoding_type='UTF32',
+            )
+        except:
+            continue
+
+        entities = response.entities
+        #print("Analyzing sentiment " + str(n))
+        words = []
+        ids = messages_and_ids[n][1]
+        for x in entities:
+            #print(x.sentiment.score)
+            #print(messages_and_ids[1][n][i])
+            try:
+                val = x.sentiment.score
+            except:
+                val = 1.0
+            if val < 0.0:
+                #g.write(messages_and_ids[n][0])
+                words.append(x.name)
+
+        #data.append({"keywords":words, "id": ids})
+        wants["keywords"].append(words)
+        wants["message_id"].append(ids)
+    wants["name"] = page["name"]
+    wants["url"] = base_url + id + "?access_token=" + access_token
+    #print(wants)
+    #g.write(str(data))
+    headers = {'content-type': 'application/json'}
+    #print(json.dumps(wants))
+    r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
+    print(r.status_code, r.reason)
+
+def begin_crawl(search_term):
+    pages = graph.search(type='page',q=search_term)
     pages = pages['data']
+    #f = open("messages.txt", "a")
+
+    g = open("complaints.txt", "w")
 
     for i in range(num_page):
         messages_and_ids = []
@@ -113,16 +169,18 @@ if __name__=="__main__":
                 except:
                     val = 1.0
                 if val < 0.0:
-                    g.write(messages_and_ids[n][0])
+                    #g.write(messages_and_ids[n][0])
                     words.append(x.name)
 
             #data.append({"keywords":words, "id": ids})
             wants["keywords"].append(words)
             wants["message_id"].append(ids)
+        wants["name"] = pages[i]["name"]
+        wants["url"] = base_url + id + "?access_token=" + access_token
         #print(wants)
         #g.write(str(data))
         headers = {'content-type': 'application/json'}
-        print(json.dumps(wants))
+        #print(json.dumps(wants))
         r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
         print(r.status_code, r.reason)
 
