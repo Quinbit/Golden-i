@@ -205,6 +205,9 @@ def begin_crawl(search_term, num_pages):
 
     g.close()
 
+def after_this_request():
+    print("Processing")
+
 @app.route('/crawl/<term>/<num_pages>', methods = ['POST'])
 def start_general_crawl(term, num_pages):
 
