@@ -205,27 +205,17 @@ def begin_crawl(search_term, num_pages):
 
     g.close()
 
-def after_this_request(func):
-    print("Processing")
-    return func
-
-@app.route('/crawl/<term>/<num_pages>', methods = ['POST'])
+@app.route('/crawl/<term>/<num_pages>')
 def start_general_crawl(term, num_pages):
+    wants = {"busy" : True, "starts": True}
+    r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
+    begin_crawl(term, num_pages)
 
-    @after_this_request
-    def do_stuff():
-        wants = {"busy" : True, "starts": True}
-        r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
-        begin_crawl(term, num_pages)
-
-@app.route('/analyze/<url>', methods = ['POST'])
+@app.route('/analyze/<url>')
 def start_specific_crawl(url):
-
-    @after_this_request
-    def do_more_stuff():
-        wants = {"busy" : True, "starts": True}
-        r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
-        crawl_page(url)
+    wants = {"busy" : True, "starts": True}
+    r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
+    crawl_page(url)
 
 if __name__=="__main__":
-    app.run(host='0.0.0.0', debug=True, port=6996, threaded=True)
+    app.run(host='0.0.0.0', debug=True, port=6996)
