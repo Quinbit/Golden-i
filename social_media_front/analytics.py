@@ -3,8 +3,7 @@ import json
 import ast
 import pymongo
 
-token = "EAACEdEose0cBAKj0Al1AjLdwqhr6A2ky5PFnoHPRHccZC9yTesSLvrfJ3aDQ77xvNVGjhomuPNnIjw7VHp4GKm3AUkEwNwTEKS8IvMhh64eZCCCZCMB1N0Y8HVNBZCBT8jq7q6dl25EdBhE43TbfaUpyymHDYRrAafuZAsEDpUEUN0TAujBLxGBFEHM4TkGf5GUja0b1XAgZDZD"
-
+token = "EAACEdEose0cBAPlGeCnP5y3VflRN34cpe0zQTRZAZB7KRZCD22qmo4ZByNZCKkrod85AH4UUR4VD0X46qZCB1sWeXUCaeeL2FIs8ZBDzuMkp9sY6izKkURBwykERJ2kjw98eDabVWtEOAKjs9OxDGjCeZBxWQki6Kp3LZCm9bSQqQkp8yDeTackY5KACIGJ1O5DI5xpWBDE42WAZDZD"
 #Get all in fb_status
 
 connection = pymongo.MongoClient('localhost', 27017)
@@ -23,3 +22,8 @@ for each in items:
 	reactions = data['data'][0]['values'][0]['value']
 	good_reactions = reactions['like'] + reactions['wow'] + reactions['love'] + reactions['haha']
 	print reactions
+	bad_reactions = reactions['anger'] + reactions['sorry']
+	likes = good_reactions
+	dislikes = bad_reactions
+	fb_status.update({"id":each["id"]}, {"$set":{"likes":likes, "dislikes":dislikes}})
+	print "Analysis successful"

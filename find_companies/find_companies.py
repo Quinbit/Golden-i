@@ -1,6 +1,7 @@
+from __future__ import print_function
 from googleapiclient.discovery import build
-from urllib.parse import urlparse
-from urllib.request import urlopen
+from urlparse import urlparse
+from urllib import *
 import pprint
 from bs4 import BeautifulSoup
 from bs4.element import Comment
@@ -12,8 +13,8 @@ import requests
 import time
 import sys
 import pymongo
-from ../page_breakdown import *
-from ../purpose_similarity import *
+from page_breakdown import *
+from purpose_similarity import *
 import warnings
 
 warnings.filterwarnings("ignore")
