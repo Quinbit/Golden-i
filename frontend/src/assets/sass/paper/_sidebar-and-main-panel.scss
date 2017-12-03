@@ -61,12 +61,13 @@
           height: 40px;
           margin-left: 0px;
           margin-right: 10px;
-          background: white;
+          background: transparent;
           border-radius: 40px;
           text-align: center;
 
         img{
-            max-width: 21px;
+            margin-top: -3px;
+            max-width: 37px;
         }
       }
     }

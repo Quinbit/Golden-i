@@ -1,4 +1,5 @@
 import pymongo
+import sys
 
 def filter_none(some_array):
 	for i in range(len(some_array)):
@@ -10,22 +11,7 @@ def filter_none(some_array):
 	return some_array
 
 
-common = {"a":0, "in": 0, "the": 0, "with": 0, "all": 0,
-	"and": 0, "on": 0, "of": 0, "to": 0, "as": 0, "for": 0,
-	"we": 0, "you": 0, "be": 0, "at": 0, "that": 0, "what": 0,
-	"i": 0, "or": 0, "are": 0, "is": 0, "he": 0, "his": 0, "it": 0,
-	"this": 0, "by": 0, "they": 0, "from": 0, "who": 0, "was": 0,
-	"there": 0, "those": 0, "very": 0, "were": 0, "also": 0,
-	"have": 0, "had": 0, "an": 0, "our": 0, "up.": 0, "will": 0,
-	"if": 0, "their": 0, "us": 0, "do": 0, "look": 0, "but": 0,
-	"has": 0, "some": 0, "then": 0, "than": 0, "between": 0,
-	"when": 0, "would": 0, "can": 0, "them": 0, "more": 0, "other": 0,
-	"nearly": 0, "it's": 0, '&': 0, "via": 0, "The": 0,
-
-	"I":0, "don't": 0,
-	"want": 0, "its": 0, "how": 0, "And": 0, "ourselves": 0, "my": 0, "so": 0,
-	"him": 0, "etc": 0, "I'm": 0, "just": 0
-	}
+common = {}
 
 
 class KeyWord:
@@ -58,8 +44,10 @@ def get_heavy(sets, percentile):
 		for other in keywords[keyword].connections:
 			if other != keyword:
 				connection_weights.append(keywords[keyword].connections[other])
-
-	heavy = sorted(connection_weights)[percentile]
+        if len(connection_weights) < percentile:
+		raise Exception("Insufficient data")
+	else:
+		heavy = sorted(connection_weights)[percentile]
 
 	well_connected = []
 
@@ -103,7 +91,8 @@ def get_cycles(input_pairs):
 		for other in all_names:
 			if each[3] < other:
 				if (each[0], other) in pairs and (each[1], other) in pairs and (each[2], other) in pairs and (each[3], other) in pairs:
-					fives.append((each[0], each[1], each[2], each[3], other))
+					fives.append((each[0], each[1], each[2], each[3], other))	
+	#print fives
 
 	return fives
 
@@ -118,7 +107,7 @@ def get_best(positives):
 			break
 		elif len(cycles) < 20:
 			#print "Too few (" + str(len(cycles)) + ") data points. Trying again..."
-			weight = int(weight + 100)
+			weight = int(weight + 50)
 		else:
 			#print "Too many (" + str(len(cycles)) + ") data points. Trying again..."
 			weight = int(weight - 70)
@@ -155,14 +144,13 @@ def parse_for_website(positives, ids):
 connection = pymongo.MongoClient('localhost', 27017)
 db = connection.goldeni
 post_data = db.post_data
-items = post_data.find()
+items = post_data.find({sys.argv[1]:sys.argv[2]})
 keywords = []
 ids = []
 for each in items:
 	keywords.append(each['keywords'])
 	ids.append(each['message_id'])
-print keywords
-print ids
+
 print parse_for_website(keywords, ids)
 
 

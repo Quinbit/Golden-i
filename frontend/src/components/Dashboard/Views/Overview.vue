@@ -22,45 +22,48 @@
     <!--Charts-->
     <div class="row">
 
-      <div class="col-xs-12">
-        <chart-card :chart-data="usersChart.data" :chart-options="usersChart.options">
-          <h4 class="title" slot="title">Users behavior</h4>
-          <span slot="subTitle"> 24 Hours performance</span>
-          <span slot="footer">
-            <i class="ti-reload"></i> Updated 3 minutes ago</span>
-          <div slot="legend">
-            <i class="fa fa-circle text-info"></i> Open
-            <i class="fa fa-circle text-danger"></i> Click
-            <i class="fa fa-circle text-warning"></i> Click Second Time
-          </div>
-        </chart-card>
+      <div class="col-md-12">
+        <div class="card card-plain">
+          <h2>Crawler Activity</h2>
+        </div>
       </div>
 
-      <div class="col-md-6 col-xs-12">
-        <chart-card :chart-data="preferencesChart.data"  chart-type="Pie">
-          <h4 class="title" slot="title">Email Statistics</h4>
-          <span slot="subTitle"> Last campaign performance</span>
-          <span slot="footer">
-            <i class="ti-timer"></i> Campaign set 2 days ago</span>
-          <div slot="legend">
-            <i class="fa fa-circle text-info"></i> Open
-            <i class="fa fa-circle text-danger"></i> Bounce
-            <i class="fa fa-circle text-warning"></i> Unsubscribe
-          </div>
-        </chart-card>
-      </div>
+      <div class="col-md-12" v-for="a in crawlerActivity">
+        <div class="card crawlerActivity">
+          <div class="row">
+            <div class="col-xs-6">
+              <h3><a :href="a.link" target="_blank">{{ a.link }}</a></h3>
+            </div>
 
-      <div class="col-md-6 col-xs-12">
-        <chart-card :chart-data="activityChart.data" :chart-options="activityChart.options">
-          <h4 class="title" slot="title">2015 Sales</h4>
-          <span slot="subTitle"> All products including Taxes</span>
-          <span slot="footer">
-            <i class="ti-check"></i> Data information certified</span>
-          <div slot="legend">
-            <i class="fa fa-circle text-info"></i> Tesla Model S
-            <i class="fa fa-circle text-warning"></i> BMW 5 Series
+            <div class="col-xs-6 text-right">
+              <h5 class="text-muted keywords">
+                <template v-for="(k, i) in a.keywords">
+                  {{ k }}
+                  <template v-if="i != a.keywords.length - 1">,</template>
+                </template>
+              </h5>
+
+              <button class="btn btn-warning btn-fill btn-wd" v-if="a.recommendations.length == 0 && !a.loading" @click="request(a)">
+                Request Analysis
+              </button>
+
+              <button class="btn btn-warning btn-fill btn-wd" v-if="a.loading" disabled>Loading...</button>
+            </div>
+
+            <div class="col-xs-12" v-if="a.recommendations.length > 0 || a.loading">
+              <hr>
+
+              <div class="text-center text-muted" v-if="a.loading">
+                Estimated time: 20 min
+              </div>
+
+              <ul class="list-inline recommendations" v-else>
+                <li v-for="rec in a.recommendations"><a :href="rec" target="_blank">{{ rec }}</a></li>
+              </ul>
+            </div>
+
           </div>
-        </chart-card>
+        </div>
       </div>
 
     </div>
@@ -75,43 +78,80 @@
       StatsCard,
       ChartCard
     },
+    methods: {
+      request (a) {
+        a.loading = true
+        setTimeout(() => {
+          a.loading = false
+          a.recommendations = [
+            'https://hackthenorth.com',
+            'https://youtube.com',
+            'https://github.com'
+          ]
+        }, 2000)
+      }
+    },
     /**
      * Chart data used to render stats, charts. Should be replaced with server data
      */
     data () {
       return {
+        crawlerActivity: [
+          {
+            link: 'https://facebook.com/posts/123',
+            keywords: ['violence', 'mass', 'domestic', 'turbo', 'queen'],
+            recommendations: [
+              'https://hackthenorth.com',
+              'https://youtube.com',
+              'https://github.com'
+            ],
+            loading: false
+          },
+          {
+            link: 'https://facebook.com/posts/jato',
+            keywords: ['one', 'two', 'three', 'four', 'five'],
+            recommendations: [],
+            loading: false
+          },
+          {
+            link: 'https://facebook.com/posts/touche',
+            keywords: ['bounce', 'charisma', 'toupe', 'maestro', 'tarama'],
+            recommendations: [],
+            loading: false
+          }
+        ],
         statsCards: [
           {
             type: 'warning',
             icon: 'ti-server',
-            title: 'Capacity',
-            value: '105GB',
-            footerText: 'Updated now',
+            title: 'Posts Analyzed',
+            value: '117',
+            footerText: 'Updated 2 mins ago',
             footerIcon: 'ti-reload'
           },
           {
             type: 'success',
             icon: 'ti-wallet',
-            title: 'Revenue',
-            value: '$1,345',
-            footerText: 'Last day',
-            footerIcon: 'ti-calendar'
+            title: 'Startups Found',
+            value: '17',
+            footerText: 'Updated 2 mins ago',
+            footerIcon: 'ti-reload'
           },
           {
             type: 'danger',
             icon: 'ti-pulse',
-            title: 'Errors',
-            value: '23',
-            footerText: 'In the last hour',
-            footerIcon: 'ti-timer'
+            title: 'Problems Found',
+            value: '212',
+            footerText: 'Updated 2 mins ago',
+            footerIcon: 'ti-reload'
           },
           {
             type: 'info',
             icon: 'ti-twitter-alt',
-            title: 'Followers',
+            title: 'SM Activity',
             value: '+45',
-            footerText: 'Updated now',
-            footerIcon: 'ti-reload'
+            footerText: 'Likes, Shares, Reacts',
+            footerIcon: 'ti-calendar'
           }
         ],
         usersChart: {
@@ -161,12 +201,31 @@
           },
           options: {}
         }
-
       }
     }
   }
-
 </script>
-<style>
-
+<style scoped>
+h3 {
+  margin-left: 1em;
+  margin-top: 0;
+  margin-bottom: 0;
+  height: 118px;
+  line-height: 118px;
+}
+.keywords {
+  margin-right: 1em;
+}
+.crawlerActivity {
+  padding: 1em;
+}
+.btn {
+  margin: 1em;
+}
+hr {
+  margin: 1em;
+}
+.recommendations {
+  margin-left: 1em;
+}
 </style>
