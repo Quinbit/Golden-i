@@ -1,5 +1,6 @@
 import pymongo
 import sys
+import json
 
 def filter_none(some_array):
 	for i in range(len(some_array)):
@@ -44,18 +45,20 @@ def get_heavy(sets, percentile):
 		for other in keywords[keyword].connections:
 			if other != keyword:
 				connection_weights.append(keywords[keyword].connections[other])
-        if len(connection_weights) < percentile:
-		raise Exception("Insufficient data")
+        if len(connection_weights) < -percentile:
+		heavy = 2
 	else:
 		heavy = sorted(connection_weights)[percentile]
 
 	well_connected = []
-
+        count = 0
 	for keyword in keywords:
 		for other in keywords[keyword].connections:
 			if keyword > other:
 				if keywords[keyword].connections[other] >= heavy:
-					well_connected.append((other, keyword))
+				    if count < -percentile:	
+                                        well_connected.append((other, keyword))
+                                        count += 1
 
 	return well_connected
 
@@ -94,22 +97,23 @@ def get_cycles(input_pairs):
 					fives.append((each[0], each[1], each[2], each[3], other))	
 	#print fives
 
-	return fives
+	if len(fives) > 0:
+            return fives
+        elif len(quads) > 0:
+            return quads
+        else:
+            return triads
 
 
 def get_best(positives):
 	weight = 300
 	for try_num in range(30):
-		#print "Try #" + str(try_num+1) + " with weight " + str(weight) + "..."
 		cycles = get_cycles(get_heavy(positives, -weight))
-		if 20 <= len(cycles) < 50:
-			#print "SUCCESS!"
+		if 10 <= len(cycles) < 50:
 			break
-		elif len(cycles) < 20:
-			#print "Too few (" + str(len(cycles)) + ") data points. Trying again..."
-			weight = int(weight + 50)
+		elif len(cycles) < 10:
+			weight = int(weight + 100)
 		else:
-			#print "Too many (" + str(len(cycles)) + ") data points. Trying again..."
 			weight = int(weight - 70)
 
 	common_words = {}
@@ -131,27 +135,32 @@ def get_best(positives):
 
 def parse_for_website(positives, ids):
 	keywords = get_best(positives)
-	top_five = keywords[:5]
+	top_five = keywords[:4]
 	points = []
 	for sentence in positives:
 		points.append(len(list(set(filter(lambda x: x in top_five, sentence)))))
 	relevant_comments = []
 	for i in range(len(ids)):
-		if points[i] == 5:
+		if points[i] == 4:
 			relevant_comments.append(ids[i])
+        if len(relevant_comments) == 0:
+                for i in range(len(ids)):
+                        if points[i] == 3:
+                                print positives[i]
+                                relevant_comments.append(ids[i])
 	return top_five, relevant_comments
 
 connection = pymongo.MongoClient('localhost', 27017)
 db = connection.goldeni
 post_data = db.post_data
-items = post_data.find({sys.argv[1]:sys.argv[2]})
+items = post_data.find({'tag':sys.argv[1]})
 keywords = []
 ids = []
 for each in items:
 	keywords.append(each['keywords'])
 	ids.append(each['message_id'])
 
-print parse_for_website(keywords, ids)
+print str(json.dumps(parse_for_website(keywords, ids)))
 
 
 #{'data': [{'id':'1', 'keywords':'hello 1 2 3'}, {'id':2', 'keywords':'hello 2 3 4'}]}

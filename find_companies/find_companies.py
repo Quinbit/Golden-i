@@ -10,6 +10,7 @@ import wikipedia
 from lxml import etree
 import requests
 import time
+import sys
 
 
 my_api_key = "AIzaSyBItnuy5o16BtfVEfCbkm6PHlq_JnlU_mY"
@@ -68,7 +69,11 @@ def get_sites(link):
     print('Opening html...')
     html = urlopen(link).read()
     print('Extracting text...')
-    text = extract_text(html)
+    text = extract_text(html).replace("A", " A").replace("B", " B").replace("C", " C").replace("D", " D").replace("E", " E")
+    text = text.replace("F", " F").replace("G", " G").replace("H", " H").replace("I", " I").replace("J", " J")
+    text = text.replace("K", " K").replace("L", " L").replace("M", " M").replace("N", " N").replace("O", " O").replace("P", " P")
+    text = text.replace("Q", " Q").replace("R", " R").replace("S", " S").replace("T", " T").replace("U", " U").replace("V", " V")
+    text = text.replace("W", " W").replace("X", " X").replace("Y", " Y").replace("Z", " Z")
     print('Filtering nouns...')
     props = get_proper_nouns(text)
     print('Trimming tokens...')
@@ -81,7 +86,7 @@ def get_sites(link):
         print('Checking noun ' + string + '...')
         try:
             # Throw exception if no wikipedia page found
-            page = wikipedia.page(string, auto_suggest=False)
+            page = wikipedia.page(string, auto_suggest=True)
 
             r = requests.get(page.url).text
             doc = etree.fromstring(r)
@@ -91,19 +96,14 @@ def get_sites(link):
             found_num_of_employees = len(num_of_employees) > 0
             if found_num_of_employees:
                 num_of_employees = int(remove_non_numeric(num_of_employees[0].text))
-
+            else:
+                print("Can't find number of employees")
             found_website = len(website) > 0
             if found_website:
                 website = website[0].attrib['href']
 
-            if not found_num_of_employees:
-                print('No employee count found')
-            elif not found_website:
-                print('No website found')
-
-            if found_num_of_employees and num_of_employees < 1000 and found_website:
+            if found_website: # and found_num_of_employees and num_of_employees < 1000:
                 print(string)
-                print(str(num_of_employees) + ' employees')
                 print(website)
                 print()
                 res_links.append(website)
@@ -113,9 +113,9 @@ def get_sites(link):
             pass
     return res_links
 
-search_phrase = 'mental violence mass people domestic "tech startup"'
+search_phrase = sys.argv[1] + ' startup'
 print('Googling \'' + search_phrase + '\'')
-results = google_search(search_phrase, num=5)
+results = google_search(search_phrase, num=10)
 company_links = []
 for link in [r['link'] for r in results]:
     print()
@@ -124,4 +124,15 @@ for link in [r['link'] for r in results]:
         company_links.append(link)
     else:
         print('*** Article link, crawling for companies: ' + link)
-        company_links.append(get_sites(link))
+        try:
+            company_links += get_sites(link)
+        except Exception as e:
+            pass
+
+boring = ['https://www.facebook.com/', 'www.wiktionary.org', 'https://www.wikidata.org/', 'http://meta.wikimedia.org', 'http://google.com', 'https://www.reddit.com/', 'https://www.facebook.com/', 'http://www.pinterest.com', 'https://www.wikipedia.org']
+
+for each in boring:
+    while each in company_links:
+        company_links.remove(each)
+
+print(company_links)
