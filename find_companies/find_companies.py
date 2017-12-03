@@ -14,6 +14,9 @@ import sys
 import pymongo
 from ../page_breakdown import *
 from ../purpose_similarity import *
+import warnings
+
+warnings.filterwarnings("ignore")
 
 my_api_key = "AIzaSyBItnuy5o16BtfVEfCbkm6PHlq_JnlU_mY"
 my_cse_id = "005011606875748037020:u78tilaw9me"
@@ -77,7 +80,7 @@ def get_sites(link):
     text = text.replace("Q", " Q").replace("R", " R").replace("S", " S").replace("T", " T").replace("U", " U").replace("V", " V")
     text = text.replace("W", " W").replace("X", " X").replace("Y", " Y").replace("Z", " Z")
     print('Filtering nouns...')
-    props = gdet_proper_nouns(text)
+    props = get_proper_nouns(text)
     print('Trimming tokens...')
     alpha = remove_non_alpha(props)
     print('Filtering proper nouns...')
@@ -121,7 +124,7 @@ gui_data = db.gui_data
 object_tag = sys.argv[1]
 object_db = gui_data.find_one({"tag":object_tag})
 object_words = " ".join(object_db["keywords"])
-search_phrase = '"' + object_tag + '" ' + object_words + ' startup'
+search_phrase = object_tag + " " + object_words + ' startup'
 print('Googling \'' + search_phrase + '\'')
 results = google_search(search_phrase, num=10)
 company_links = []
@@ -142,6 +145,8 @@ boring = ['https://www.facebook.com/', 'www.wiktionary.org', 'https://www.wikida
 for each in boring:
     while each in company_links:
         company_links.remove(each)
+
+company_links = list(set(company_links))
 
 gui_data.update({"tag":object_tag}, {"$set":{"links_available":True, "links":company_links}})
 
