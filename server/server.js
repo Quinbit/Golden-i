@@ -65,6 +65,14 @@ app.post("/post_data", function(req, res) {
   var dataurl = req.body.url;
   var tag = req.body.tag;
 
+  child = exec("python ../keyword_cycle/keyword_finder.py \"" + tag + "\"", function (error, stdout, stderr) {
+    console.log('stdout: ' + stdout);
+    console.log('stderr: ' + stderr);
+    if (error !== null) {
+       console.log('exec error: ' + error);
+    }
+  });
+
   for(var i = 0; i < keywords.length; i++)
     data.push({"keywords":keywords[i], "message_id":message[i], "name":name, "url":dataurl, "tag":tag});
 
@@ -78,13 +86,6 @@ app.post("/post_data", function(req, res) {
     res.end(JSON.stringify(json));
 
     if(!dberr) {
-      child = exec("python ../keyword_cycle/keyword_finder.py \"" + tag + "\"", function (error, stdout, stderr) {
-        console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
-        if (error !== null) {
-           console.log('exec error: ' + error);
-        }
-      });
       child();
     }
   });
