@@ -5,7 +5,7 @@ const SidebarStore = {
   sidebarLinks: [
     {
       name: 'Dashboard',
-      icon: 'ti-panel',
+      icon: 'ti-user',
       path: '/admin/overview'
     },
     {
@@ -37,6 +37,16 @@ const SidebarStore = {
       name: 'Notifications',
       icon: 'ti-bell',
       path: '/admin/notifications'
+    },
+    {
+      name: 'Crawler Control',
+      icon: 'ti-panel',
+      path: '/admin/crawler'
+    },
+    {
+      name: 'Test Runner',
+      icon: 'ti-bell',
+      path: '/admin/test'
     }
   ],
   displaySidebar (value) {
