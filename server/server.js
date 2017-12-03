@@ -129,7 +129,7 @@ app.get("/get_fb_status", function(req, res) {
   });
 });
 
-app.post("/request_analysis", function(req, res){
+app.post("/request_analysis", function(req, res) {
   var request_url = url.parse(req.url, true);
   console.log("Incoming POST request to " + request_url.pathname + " from " + req.connection.remoteAddress);
 
@@ -137,6 +137,23 @@ app.post("/request_analysis", function(req, res){
 
   var tag = req.body.tag;
   PythonShell.run("../find_companies/find_companies.py", {pythonPath:"python3", args:[tag]}, function(pyerr, pyres) {
+    res.end(JSON.stringify({"status":pyerr ? "fail" : "success"}));
+
+    if(pyerr) throw pyerr;
+    console.log(pyres);
+  });
+});
+
+app.post("/fb_new_post", function(req, res) {
+  var request_url = url.parse(req.url, true);
+  console.log("Incoming POST request to " + request_url.pathname + " from " + req.connection.remoteAddress);
+
+  res.writeHead(200, {"Content-Type": "application/json"});
+
+  var desc = req.body.description;
+  var link = req.body.link;
+  var id = req.body.id;
+  PythonShell.run("../social_media_front/new_link.py", {args:[desc, link, id]}, function(pyerr, pyres) {
     res.end(JSON.stringify({"status":pyerr ? "fail" : "success"}));
 
     if(pyerr) throw pyerr;
