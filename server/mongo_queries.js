@@ -11,7 +11,7 @@ function get_gui(db, callback) {
 }
 
 function get_fb_status(db, callback) {
-  db.collection("fb_status").find({}).toArray(callback);
+  db.collection("fb_posts").find({}).toArray(callback);
 }
 
 module.exports.mongo_queries = {

@@ -136,7 +136,7 @@ app.post("/request_analysis", function(req, res) {
   res.writeHead(200, {"Content-Type": "application/json"});
 
   var tag = req.body.tag;
-  PythonShell.run("../find_companies/find_companies.py", {pythonPath:"python3", args:[tag]}, function(pyerr, pyres) {
+  PythonShell.run("../find_companies/find_companies.py", {pythonPath:"python", args:[tag]}, function(pyerr, pyres) {
     res.end(JSON.stringify({"status":pyerr ? "fail" : "success"}));
 
     //if(pyerr) throw pyerr;

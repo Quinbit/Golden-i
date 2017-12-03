@@ -1,0 +1,22 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/home/morris/.nvm/versions/node/v5.9.0/bin/node',
+1 verbose cli   '/home/morris/.nvm/versions/node/v5.9.0/bin/npm',
+1 verbose cli   'start' ]
+2 info using npm@3.7.3
+3 info using node@v5.9.0
+4 verbose stack Error: ENOENT: no such file or directory, open '/home/morris/Github/Golden-i/find_companies/package.json'
+4 verbose stack     at Error (native)
+5 verbose cwd /home/morris/Github/Golden-i/find_companies
+6 error Linux 3.10.0-693.5.2.el7.x86_64
+7 error argv "/home/morris/.nvm/versions/node/v5.9.0/bin/node" "/home/morris/.nvm/versions/node/v5.9.0/bin/npm" "start"
+8 error node v5.9.0
+9 error npm  v3.7.3
+10 error path /home/morris/Github/Golden-i/find_companies/package.json
+11 error code ENOENT
+12 error errno -2
+13 error syscall open
+14 error enoent ENOENT: no such file or directory, open '/home/morris/Github/Golden-i/find_companies/package.json'
+15 error enoent ENOENT: no such file or directory, open '/home/morris/Github/Golden-i/find_companies/package.json'
+15 error enoent This is most likely not a problem with npm itself
+15 error enoent and is related to npm not being able to find a file.
+16 verbose exit [ -2, true ]
