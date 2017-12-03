@@ -32,11 +32,17 @@
         <div class="card crawlerActivity">
           <div class="row">
             <div class="col-xs-6">
-              <h3><a :href="a.link" target="_blank">{{ a.link }}</a></h3>
+              <h2>{{ a.tag | capitalize }}</h2>
+              <p class="names">
+                <template v-for="(name, i) in a.names">
+                  <span class="name">{{ name }}</span>
+                  <span v-if="i != a.names.length - 1" class="name">| </span>
+                </template>
+              </p>
             </div>
 
             <div class="col-xs-6 text-right">
-              <h5 class="text-muted keywords">
+              <h5 class="keywords">
                 <template v-for="(k, i) in a.keywords">
                   {{ k }}
                   <template v-if="i != a.keywords.length - 1">,</template>
@@ -80,16 +86,116 @@
     },
     methods: {
       request (a) {
+        // Create the XHR object.
+        function createCORSRequest (method, url, data) {
+          var xhr = new XMLHttpRequest()
+          if ('withCredentials' in xhr) {
+            // XHR for Chrome/Firefox/Opera/Safari.
+            xhr.open(method, url, true)
+            xhr.setRequestHeader('Content-Type', 'application/json')
+            xhr.send(JSON.stringify(data))
+          } else if (typeof XDomainRequest !== 'undefined') {
+            // XDomainRequest for IE.
+            xhr = new XDomainRequest()
+            xhr.open(method, url)
+            xhr.setRequestHeader('Content-Type', 'application/json')
+            xhr.send(JSON.stringify(data))
+          } else {
+            // CORS not supported.
+            xhr = null
+          }
+          return xhr
+        }
+
+        var url = 'http://morrisjchen.com:4242/request_analysis'
+
+        var xhr = createCORSRequest('POST', url, { tag: a.tag })
+        if (!xhr) {
+          alert('CORS not supported')
+          return
+        }
+
+        // Response handlers.
+        xhr.onerror = function () {
+          alert('Woops, there was an error making the request.')
+        }
+
         a.loading = true
-        setTimeout(() => {
-          a.loading = false
-          a.recommendations = [
-            'https://hackthenorth.com',
-            'https://youtube.com',
-            'https://github.com'
-          ]
-        }, 2000)
+
+        xhr.send()
       }
+    },
+    created () {
+      // Create the XHR object.
+      function createCORSRequest (method, url) {
+        var xhr = new XMLHttpRequest()
+        if ('withCredentials' in xhr) {
+          // XHR for Chrome/Firefox/Opera/Safari.
+          xhr.open(method, url, true)
+        } else if (typeof XDomainRequest !== 'undefined') {
+          // XDomainRequest for IE.
+          xhr = new XDomainRequest()
+          xhr.open(method, url)
+        } else {
+          // CORS not supported.
+          xhr = null
+        }
+        return xhr
+      }
+
+      var url = 'http://morrisjchen.com:4242/get_gui'
+
+      var xhr = createCORSRequest('GET', url)
+      if (!xhr) {
+        alert('CORS not supported')
+        return
+      }
+
+      // Response handlers.
+      xhr.onload = () => {
+        var text = xhr.responseText
+        var json = JSON.parse(text)
+
+        this.crawlerActivity = json.map(act => {
+          return {
+            id: act._id,
+            tag: act.tag,
+            keywords: act.keywords,
+            names: act.names,
+            recommendations: act.links === null ? [] : act.links,
+            loading: false
+          }
+        })
+      }
+
+      xhr.onerror = function () {
+        alert('Woops, there was an error making the request.')
+      }
+
+      xhr.send()
+
+      // FB status
+
+      url = 'http://morrisjchen.com:4242/get_fb_status'
+
+      var xhr2 = createCORSRequest('GET', url)
+      if (!xhr2) {
+        alert('CORS not supported')
+        return
+      }
+
+      // Response handlers.
+      xhr2.onload = () => {
+        var text = xhr2.responseText
+        var json = JSON.parse(text)
+        this.statsCards[3].value = json.reduce((acc, val) => acc + val.likes, 0)
+      }
+
+      xhr2.onerror = function () {
+        alert('Woops, there was an error making the request.')
+      }
+
+      xhr2.send()
     },
     /**
      * Chart data used to render stats, charts. Should be replaced with server data
@@ -98,8 +204,9 @@
       return {
         crawlerActivity: [
           {
-            link: 'https://facebook.com/posts/123',
+            tag: 'Culture',
             keywords: ['violence', 'mass', 'domestic', 'turbo', 'queen'],
+            names: ['Festival', 'Stampede'],
             recommendations: [
               'https://hackthenorth.com',
               'https://youtube.com',
@@ -108,14 +215,16 @@
             loading: false
           },
           {
-            link: 'https://facebook.com/posts/jato',
+            tag: 'Tech',
             keywords: ['one', 'two', 'three', 'four', 'five'],
+            names: ['TechCrunch', 'Waterloo'],
             recommendations: [],
             loading: false
           },
           {
-            link: 'https://facebook.com/posts/touche',
+            tag: 'Health',
             keywords: ['bounce', 'charisma', 'toupe', 'maestro', 'tarama'],
+            names: ['AHS', 'Health Card'],
             recommendations: [],
             loading: false
           }
@@ -149,8 +258,8 @@
             type: 'info',
             icon: 'ti-twitter-alt',
             title: 'SM Activity',
-            value: '+45',
-            footerText: 'Likes, Shares, Reacts',
+            value: '...',
+            footerText: 'Likes and comments',
             footerIcon: 'ti-calendar'
           }
         ],
@@ -206,18 +315,23 @@
   }
 </script>
 <style scoped>
-h3 {
-  margin-left: 1em;
-  margin-top: 0;
+h2 {
+  margin-left: 0.5em;
+  margin-top: 0.5em;
   margin-bottom: 0;
-  height: 118px;
-  line-height: 118px;
 }
 .keywords {
   margin-right: 1em;
 }
 .crawlerActivity {
   padding: 1em;
+}
+.names {
+  margin-left: 1.25em;
+  margin-top: 1em;
+}
+.name {
+  margin-right: 0.5em;
 }
 .btn {
   margin: 1em;
