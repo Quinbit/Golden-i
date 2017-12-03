@@ -111,6 +111,24 @@ app.get("/get_gui", function(req, res) {
   });
 });
 
+app.get("/get_fb_status", function(req, res) {
+  var request_url = url.parse(req.url, true);
+  console.log("Incoming GET request to " + request_url.pathname + " from " + req.connection.remoteAddress);
+
+  var query = request_url.query;
+
+  res.writeHead(200, {'Content-Type': 'application/json'});
+
+  PythonShell.run("../social_media_front/analytics.py", function(pyerr, pyres) {
+    console.log(pyerr);
+
+    queries.get_fb_status(db, function(dberr, dbres) {
+      console.log(dbres);
+      res.end(JSON.stringify(dbres));
+    });
+  });
+});
+
 app.post("/request_analysis", function(req, res){
   var request_url = url.parse(req.url, true);
   console.log("Incoming POST request to " + request_url.pathname + " from " + req.connection.remoteAddress);
@@ -124,8 +142,6 @@ app.post("/request_analysis", function(req, res){
     if(pyerr) throw pyerr;
     console.log(pyres);
   });
-
-
 });
 
 var dbport = 27017;
