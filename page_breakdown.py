@@ -3,6 +3,7 @@ from google.oauth2 import service_account
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import Comment
+import imgkit
 
 client = language.LanguageServiceClient()
 
@@ -47,3 +48,4 @@ def get_breakdown(url):
 if __name__=="__main__":
     url = "https://techcrunch.com/2016/05/12/the-technology-driven-transformation-of-wealth-management/"
     print(get_breakdown(url))
+    imgkit.from_url(url, 'image.jpg')
