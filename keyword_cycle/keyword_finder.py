@@ -1,5 +1,6 @@
 import pymongo
 import sys
+import json
 
 def filter_none(some_array):
 	for i in range(len(some_array)):
@@ -107,16 +108,12 @@ def get_cycles(input_pairs):
 def get_best(positives):
 	weight = 300
 	for try_num in range(30):
-		print "Try #" + str(try_num+1) + " with weight " + str(weight) + "..."
 		cycles = get_cycles(get_heavy(positives, -weight))
 		if 10 <= len(cycles) < 50:
-			print "SUCCESS!"
 			break
 		elif len(cycles) < 10:
-			print "Too few (" + str(len(cycles)) + ") data points. Trying again..."
 			weight = int(weight + 100)
 		else:
-			print "Too many (" + str(len(cycles)) + ") data points. Trying again..."
 			weight = int(weight - 70)
 
 	common_words = {}
@@ -156,14 +153,14 @@ def parse_for_website(positives, ids):
 connection = pymongo.MongoClient('localhost', 27017)
 db = connection.goldeni
 post_data = db.post_data
-items = post_data.find({sys.argv[1]:sys.argv[2]})
+items = post_data.find({'tag':sys.argv[1]})
 keywords = []
 ids = []
 for each in items:
 	keywords.append(each['keywords'])
 	ids.append(each['message_id'])
 
-print parse_for_website(keywords, ids)
+print str(json.dumps(parse_for_website(keywords, ids)))
 
 
 #{'data': [{'id':'1', 'keywords':'hello 1 2 3'}, {'id':2', 'keywords':'hello 2 3 4'}]}
