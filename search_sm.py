@@ -209,17 +209,19 @@ def begin_crawl(search_term, num_pages):
 def start_general_crawl(term, num_pages):
 
     @after_this_request
-    wants = {"busy" : True, "starts": True}
-    r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
-    begin_crawl(term, num_pages)
+    def do_stuff():
+        wants = {"busy" : True, "starts": True}
+        r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
+        begin_crawl(term, num_pages)
 
 @app.route('/analyze/<url>', methods = ['POST'])
 def start_specific_crawl(url):
 
     @after_this_request
-    wants = {"busy" : True, "starts": True}
-    r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
-    crawl_page(url)
+    def do_more_stuff():
+        wants = {"busy" : True, "starts": True}
+        r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
+        crawl_page(url)
 
 if __name__=="__main__":
     app.run(host='0.0.0.0', debug=True, port=6996, threaded=True)
