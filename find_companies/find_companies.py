@@ -151,6 +151,8 @@ company_links = list(set(company_links))
 
 gui_data.update({"tag":object_tag}, {"$set":{"links_available":True, "links":company_links}})
 
+print(company_links)
+
 company_links = order_list(company_links, object_db["keywords"])
 
 print(company_links)

@@ -22,11 +22,15 @@ def extract_text(html):
     return ''.join(t.strip() for t in visible_texts)
 
 def get_breakdown(url):
-    f = requests.get(url)
+    try:
+    	f = requests.get(url)
+    except:
+	print("Failed to access url")
+	return []
     text = f.text
     string = extract_text(text)
 
-    print(string)
+    #print(string)
 
     document = language.types.Document(
         content=str(string.encode("ascii","ignore")),
@@ -48,10 +52,12 @@ def get_breakdown(url):
 def order_list(links, terms):
     words = []
     for i in range(len(links)):
+	print("Breaking down word " + str(i+1))
         words.append(get_breakdown(links[i]))
 
     similarity = []
     for i in range(len(words)):
+	print("Getting similarity of " + str(i+1))
         similarity.append([similarity_of_set(words[i], terms), links[i]])
 
     l = sorted(similarity)
@@ -59,10 +65,12 @@ def order_list(links, terms):
     final_link = []
 
     for i in range(len(similarity)):
-        final_link.append(similarity[i][1])
+        final_link.append(l[i][1])
+
+    return final_link
 
 
 if __name__=="__main__":
     url = "https://techcrunch.com/2016/05/12/the-technology-driven-transformation-of-wealth-management/"
-    print(get_breakdown(url))
+    get_breakdown(url)
     imgkit.from_url(url, 'image.jpg')
