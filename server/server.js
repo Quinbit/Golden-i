@@ -37,19 +37,32 @@ app.get("/", function(req, res) {
   console.log(query);
 });
 
+var busy = false;
+
 app.post("/post_data", function(req, res) {
   var request_url = url.parse(req.url, true);
   console.log("Incoming POST request to " + request_url.pathname + " from " + req.connection.remoteAddress);
 
+  res.writeHead(200, {"Content-Type": "application/json"});
+
   var data = [];
+  
+  busy = req.body.busy;
+
+  var starts = req.body.starts;
+  if(starts) {
+    res.end();
+    return;
+  }
+  
   var keywords = req.body.keywords;
   var message = req.body.message_id;
   var name = req.body.name;
   var dataurl = req.body.url;
+  var tag = req.body.tag;
 
-  for(var i = 0; i < keywords.length; i++) data.push({"keywords":keywords[i], "message_id":message[i], "name":name, "url":dataurl});
-
-  res.writeHead(200, {"Content-Type": "application/json"});
+  for(var i = 0; i < keywords.length; i++)
+    data.push({"keywords":keywords[i], "message_id":message[i], "name":name, "url":dataurl, "tag":tag});
 
   queries.post_data(db, data, function(dberr, dbres) {
     var json = {

@@ -3,9 +3,11 @@ import requests
 from google.cloud import language
 from google.oauth2 import service_account
 import json
+from flask import Flask, jsonify
+from flask_cors import CORS
 
 
-access_token = "EAACEdEose0cBAM6DeELkJz7PfdV4XMz2ZAsUpD1fcmSq07ohI7iunkcl0BR3h1HAdTWWgXwFLX0j2FqLu1IuPrAcRWM7BP7DLXM3A6LzCr43eNLjpBz11z8bQjrpykOhv508ptICIAIaqRZAC0yF9eW3WwYXhEMPUcrpPnVaPUtKnxbgrZACZA6bfZAKrLI0ZD"
+access_token = "EAACEdEose0cBAF1ZAQei8ylTpvSD5eV40CEpiZAN8IdPzaAsvPAzMgkdeToJERjgjig1tg9OTufcuXoBh4oYfZBcKGhyQwA9PeZADZAKabUNorF7AqAnylhpIb3c9mNLr9tV8NiAltnvywbIpOdHxttAxAOQVWm7wSSzlEeAmN3YYylZAjGpWrm1FpGIXe3OkZD"
 graph = facebook.GraphAPI(access_token=access_token, version="2.11")
 
 base_url = "https://graph.facebook.com/v2.7/"
@@ -16,12 +18,20 @@ max_comments = 10
 client = language.LanguageServiceClient()
 
 needs = ['want', 'wish', 'problem', 'issue', 'dislike', 'annoying', 'annoyance']
+headers = {'content-type': 'application/json'}
+
+app = Flask(__name__)
+CORS(app)
 
 def get_facebook_data(index, url):
     r = requests.get(url)
     data = r.json()
     #print(data)
-    paging = data["paging"]
+    paging = data.get("paging", 0)
+
+    if paging == 0:
+        return []
+
     data = data['data']
     n_page = paging.get("next", 0)
     print("Working on page " + str(max_page - index + 1))
@@ -114,6 +124,9 @@ def crawl_page(url):
         wants["message_id"].append(ids)
     wants["name"] = page["name"]
     wants["url"] = base_url + id + "?access_token=" + access_token
+    wants["tag"] = page["name"]
+    wants["busy"] = False
+    wants["starts"] = False
     #print(wants)
     #g.write(str(data))
     headers = {'content-type': 'application/json'}
@@ -121,14 +134,14 @@ def crawl_page(url):
     r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
     print(r.status_code, r.reason)
 
-def begin_crawl(search_term):
+def begin_crawl(search_term, num_pages):
     pages = graph.search(type='page',q=search_term)
     pages = pages['data']
     #f = open("messages.txt", "a")
 
     g = open("complaints.txt", "w")
 
-    for i in range(num_page):
+    for i in range(min(int(num_pages), len(pages))):
         messages_and_ids = []
         id = pages[i]['id']
         print("Processing " + pages[i]["name"])
@@ -177,9 +190,11 @@ def begin_crawl(search_term):
             wants["message_id"].append(ids)
         wants["name"] = pages[i]["name"]
         wants["url"] = base_url + id + "?access_token=" + access_token
+        wants["tag"] = search_term
+        wants["busy"] = not (i == (int(num_pages) - 1))
+        wants["starts"] = False
         #print(wants)
         #g.write(str(data))
-        headers = {'content-type': 'application/json'}
         #print(json.dumps(wants))
         r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
         print(r.status_code, r.reason)
@@ -189,3 +204,20 @@ def begin_crawl(search_term):
     #f.close()
 
     g.close()
+
+@app.route('/crawl/<term>/<num_pages>', methods=['POST'])
+def start_general_crawl(term, num_pages):
+    wants = {"busy" : True, "starts": True}
+    r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
+    begin_crawl(term, num_pages)
+    return("hello world")
+
+@app.route('/analyze/<url>', methods=['POST'])
+def start_specific_crawl(url):
+    wants = {"busy" : True, "starts": True}
+    r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
+    crawl_page(url)
+    return("hello world")
+
+if __name__=="__main__":
+    app.run(host='0.0.0.0', debug=True, port=6996)
