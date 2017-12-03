@@ -25,6 +25,6 @@ if "id" in server_response.keys():
 	connection=pymongo.MongoClient('localhost', 27017)
 	db = connection.goldeni
 	fb_posts = db.fb_posts
-	fb_posts.insert({'description':problem_description, 'link':solution, 'facebook_post_id':server_response['id'], 'id':post_id})
+	fb_posts.insert({'likes':0, 'description':problem_description, 'link':solution, 'facebook_post_id':server_response['id'], 'id':post_id})
 else:
 	raise Exception("Could not send post to fb. The response was " + str(server_response))
