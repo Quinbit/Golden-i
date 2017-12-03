@@ -37,6 +37,8 @@ app.get("/", function(req, res) {
   console.log(query);
 });
 
+var exec = require('child_process').exec, child;
+
 var busy = false;
 
 app.post("/post_data", function(req, res) {
@@ -46,7 +48,7 @@ app.post("/post_data", function(req, res) {
   res.writeHead(200, {"Content-Type": "application/json"});
 
   var data = [];
-  
+
   busy = req.body.busy;
 
   var starts = req.body.starts;
@@ -54,7 +56,7 @@ app.post("/post_data", function(req, res) {
     res.end();
     return;
   }
-  
+
   var keywords = req.body.keywords;
   var message = req.body.message_id;
   var name = req.body.name;
@@ -70,6 +72,17 @@ app.post("/post_data", function(req, res) {
       "result": dbres
     };
     res.end(JSON.stringify(json));
+
+    if(!dberr) {
+      child = exec("python ../keyword_cycle/keyword_finder.py \"" + tag + "\"", function (error, stdout, stderr) {
+        console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+        if (error !== null) {
+           console.log('exec error: ' + error);
+        }
+      });
+      child();
+    }
   });
 });
 
