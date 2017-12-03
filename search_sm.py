@@ -31,7 +31,7 @@ def get_facebook_data(index, url):
 
     if paging == 0:
         return []
-    
+
     data = data['data']
     n_page = paging.get("next", 0)
     print("Working on page " + str(max_page - index + 1))
@@ -218,4 +218,4 @@ def start_specific_crawl(url):
     crawl_page(url)
 
 if __name__=="__main__":
-    app.run(host='0.0.0.0', debug=True, port=6996)
+    app.run(host='0.0.0.0', debug=True, port=6996, threaded=True)
