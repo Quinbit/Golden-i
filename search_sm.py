@@ -20,11 +20,6 @@ needs = ['want', 'wish', 'problem', 'issue', 'dislike', 'annoying', 'annoyance']
 
 app = Flask(__name__)
 
-results = [
-    {"state":"idle"},
-    {"state":"working"}
-]
-
 def get_facebook_data(index, url):
     r = requests.get(url)
     data = r.json()
@@ -123,6 +118,7 @@ def crawl_page(url):
     wants["name"] = page["name"]
     wants["url"] = base_url + id + "?access_token=" + access_token
     wants["tag"] = page["name"]
+    wants["ends"] = True
     #print(wants)
     #g.write(str(data))
     headers = {'content-type': 'application/json'}
@@ -130,14 +126,14 @@ def crawl_page(url):
     r = requests.post("http://morrisjchen.com:4242/post_data", json=wants, headers=headers)
     print(r.status_code, r.reason)
 
-def begin_crawl(search_term):
+def begin_crawl(search_term, num_pages):
     pages = graph.search(type='page',q=search_term)
     pages = pages['data']
     #f = open("messages.txt", "a")
 
     g = open("complaints.txt", "w")
 
-    for i in range(num_page):
+    for i in range(int(num_pages)):
         messages_and_ids = []
         id = pages[i]['id']
         print("Processing " + pages[i]["name"])
@@ -187,6 +183,7 @@ def begin_crawl(search_term):
         wants["name"] = pages[i]["name"]
         wants["url"] = base_url + id + "?access_token=" + access_token
         wants["tag"] = search_term
+        wants["ends"] = (i == (int(num_pages) - 1))
         #print(wants)
         #g.write(str(data))
         headers = {'content-type': 'application/json'}
@@ -200,13 +197,13 @@ def begin_crawl(search_term):
 
     g.close()
 
-@app.route('/crawl/<term>')
-def start_general_crawl(term):
-    begin_crawl(term)
+@app.route('/crawl/<term>/<num_pages>')
+def start_general_crawl(term, num_pages):
+    begin_crawl(term, num_pages)
 
 @app.route('/analyze/<url>')
 def start_specific_crawl(url):
     crawl_page(url)
 
 if __name__=="__main__":
-    app.run(host='0.0.0.0', debug=True, port=3134)
+    app.run(host='0.0.0.0', debug=True, port=6996)
