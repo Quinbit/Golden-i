@@ -29,7 +29,7 @@ def get_breakdown(url):
     print(string)
 
     document = language.types.Document(
-        content=str(string),
+        content=str(string.encode("ascii","ignore")),
         type='PLAIN_TEXT',
     )
 
