@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from bs4.element import Comment
 import imgkit
+from purpose_similarity import *
 
 client = language.LanguageServiceClient()
 
@@ -43,6 +44,22 @@ def get_breakdown(url):
         words.append(x.name)
 
     return words
+
+def order_list(links, terms):
+    words = []
+    for i in range(len(links)):
+        words.append(get_breakdown(links[i]))
+
+    similarity = []
+    for i in range(len(words)):
+        similarity.append([similarity_of_set(words[i], terms), links[i]])
+
+    l = sorted(similarity)
+
+    final_link = []
+
+    for i in range(len(similarity)):
+        final_link.append(similarity[i][1])
 
 
 if __name__=="__main__":

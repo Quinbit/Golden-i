@@ -12,6 +12,8 @@ import requests
 import time
 import sys
 import pymongo
+from ../page_breakdown import *
+from ../purpose_similarity import *
 
 my_api_key = "AIzaSyBItnuy5o16BtfVEfCbkm6PHlq_JnlU_mY"
 my_cse_id = "005011606875748037020:u78tilaw9me"
@@ -142,5 +144,7 @@ for each in boring:
         company_links.remove(each)
 
 gui_data.update({"tag":object_tag}, {"$set":{"links_available":True, "links":company_links}})
+
+company_links = order_list(company_links, object_db["keywords"])
 
 print(company_links)
